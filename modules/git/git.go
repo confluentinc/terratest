@@ -2,26 +2,78 @@
 package git
 
 import (
-	"os/exec"
-	"strings"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"testing"
 )
 
-// GetCurrentBranchName retrieves the current branch name.
-func GetCurrentBranchName(t *testing.T) string {
-	out, err := GetCurrentBranchNameE(t)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return out
-}
+func CloneRepository(t *testing.T, url string, path string, commit string) (string, error) {
 
-// GetCurrentBranchNameE retrieves the current branch name.
-func GetCurrentBranchNameE(t *testing.T) (string, error) {
-	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
-	bytes, err := cmd.Output()
+	r, err := git.PlainClone(path, false, &git.CloneOptions{
+		URL:               url,
+		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+	})
+
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimSpace(string(bytes)), nil
+
+	w, err := r.Worktree()
+
+	if err != nil {
+		return "", err
+	}
+
+	// ... checking out to commit
+	err = w.Checkout(&git.CheckoutOptions{
+		Hash: plumbing.NewHash(commit),
+	})
+
+	if err != nil {
+		return "", err
+	}
+	ref, err := r.Head()
+
+	return ref.Name().String(), nil
+}
+
+// GetCurrentBranchName retrieves the current branch name.
+func GetCurrentBranchName(t *testing.T, path string) (string, error) {
+
+	// We instance a new repository targeting the given path (the .git folder)
+	r, err := git.PlainOpen(path)
+
+	if err != nil {
+		return "", err
+	}
+
+	// ... retrieving the HEAD reference
+	ref, err := r.Head()
+	return ref.Name().String(), nil
+
+}
+
+// CheckoutCommitName checksout commit name.
+func CheckoutCommitName(t *testing.T, path string, commit string) (string, error) {
+
+	// We instance a new repository targeting the given path (the .git folder)
+	r, err := git.PlainOpen(path)
+
+	if err != nil {
+		return "", err
+	}
+
+	w, err := r.Worktree()
+	// ... checking out to commit
+	err = w.Checkout(&git.CheckoutOptions{
+		Hash: plumbing.NewHash(commit),
+	})
+
+	if err != nil {
+		return "", err
+	}
+	ref, err := r.Head()
+
+	return ref.Name().String(), nil
+
 }
