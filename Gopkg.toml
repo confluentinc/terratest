@@ -49,6 +49,10 @@
   branch = "master"
   name = "golang.org/x/net"
 
+[[constraint]]
+  version = "v4.5.0"
+  name = "gopkg.in/src-d/go-git.v4"
+
 [prune]
   go-tests = true
   unused-packages = true
