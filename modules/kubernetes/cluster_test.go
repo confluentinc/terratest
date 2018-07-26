@@ -1,17 +1,17 @@
 package kubernetes
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"testing"
 )
 
 func TestValidateKubernetesConfiguration(t *testing.T) {
-
-	kubecfgstring :=[]byte(`
+	t.Parallel()
+	kubecfgstring := []byte(`
 apiVersion: v1
 clusters:
 - cluster:
@@ -52,7 +52,7 @@ users:
     client-key: /Users/nobody/.minikube/client.key
 `)
 
-	tmpfile, err := ioutil.TempFile("", "example")
+	tmpfile, err := ioutil.TempFile("", "generic_fake_kubecfg")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,10 +70,11 @@ users:
 	assert.NotPanics(t, func() { ValidateKubernetesConfiguration(t, path) })
 }
 
-func TestValidateKubernetesConfigurationWithInvalidPath(t *testing.T) {
+func TestValidateKubernetesConfigurationWithInvalidConfig(t *testing.T) {
+	t.Parallel()
 
 	content := []byte("{}")
-	tmpfile, err := ioutil.TempFile("", "example")
+	tmpfile, err := ioutil.TempFile("", "generic_invalid_kubecfg")
 	if err != nil {
 		log.Fatal(err)
 	}
