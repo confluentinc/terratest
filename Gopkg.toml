@@ -53,6 +53,14 @@
   version = "v4.5.0"
   name = "gopkg.in/src-d/go-git.v4"
 
+[[constraint]]
+   name = "k8s.io/apimachinery"
+   branch = "master"
+
+[[constraint]]
+   name = "k8s.io/client-go"
+   branch = "master"
+
 [prune]
   go-tests = true
   unused-packages = true
